@@ -1,17 +1,19 @@
 <template>
-  <h1> Hi</h1>
+  <h1>Hi</h1>
   <div id="loginbtn">
-    <a href="https://github.com/login/oauth/authorize?client_id=31944c9de13db2f176b5"> OAuth Test</a>
+    <a class=""
+      href="https://github.com/login/oauth/authorize?client_id=31944c9de13db2f176b5">
+      OAuth Test</a>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'HelloWorld',
+  name: "HelloWorld",
   props: {
-    msg: String
-  }
-}
+    msg: String,
+  },
+};
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
