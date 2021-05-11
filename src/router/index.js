@@ -17,10 +17,10 @@ const routes = [
   //   component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
   // },
   {
-    path: '/oauth',
+    path: '/login',
     name: 'Login',
     component: Login
-  }
+  },
 ]
 
 const router = createRouter({
@@ -28,4 +28,17 @@ const router = createRouter({
   routes
 })
 
+
+
 export default router
+
+router.beforeEach((to,from,next) => {
+  const publicPages = ['/login']
+  const isPrivatePage = !publicPages.includes(to.path)
+  
+  if(isPrivatePage && !sessionStorage.getItem('patoken')){
+    return next({name:'Login'})
+  } else {
+    next()
+  }
+})

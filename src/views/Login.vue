@@ -6,9 +6,12 @@
         </div>
         <div class="card-body">
           <div class="card-title text-center mt-3" style="width:18rem;">
-            <h5>GitHub Verwaltungstool für Repositories</h5>
+            <h5>GitHub Frontend</h5>
           </div>
-          <a href="https://github.com/login/oauth/authorize?client_id=31944c9de13db2f176b5" class="btn btn-primary mt-5 rounded-pill">Sign in via GitHub</a>
+          <p class="mt-5">
+            <input type="text" v-model="patoken">
+          </p>
+          <button @click="persist" class="btn btn-primary rounded-pill">Sign in via GitHub</button>
         </div>
       </div>
   </div>
@@ -16,6 +19,18 @@
 
 <script>
 export default {
+
+  data (){
+    return{
+      patoken:''
+    }
+  },
+
+  methods: {
+    persist(){
+      sessionStorage.patoken = this.patoken;
+    }
+  }
 
 }
 </script>
