@@ -9,7 +9,7 @@
             <h5>GitHub Frontend</h5>
           </div>
           <p class="mt-5">
-            <input type="text" v-model="patoken">
+            <input type="text" class="rounded-pill" v-model="patoken">
           </p>
           <button @click="persist" class="btn btn-primary rounded-pill">Sign in via GitHub</button>
         </div>
@@ -18,6 +18,7 @@
 </template>
 
 <script>
+import API_Service from '../services/API'
 export default {
 
   data (){
@@ -29,6 +30,10 @@ export default {
   methods: {
     persist(){
       sessionStorage.patoken = this.patoken;
+      API_Service.getCurrentUser().then(response => {
+        console.log("GET USER RESPONSE: ", response.data)
+      })
+      this.$router.push('')
     }
   }
 
