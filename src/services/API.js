@@ -25,5 +25,17 @@ class API_Service {
         }
 
     }
+    
+    getUserOrgs() {
+        return axios
+            .get(API_URL + '/user/orgs')
+            .then(response => {
+                console.log('Got the orgs for the authenticated user: ',response)
+                return response;
+            })
+            .catch(error=>{
+                console.log(error)
+            })
+    }
 }
 export default new API_Service;
