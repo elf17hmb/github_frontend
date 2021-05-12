@@ -1,5 +1,5 @@
 <template>
-  <div class="container h-100 d-flex justify-content-center align-items-center loginbg">
+  <div class="h-100 d-flex justify-content-center align-items-center loginbg">
       <div class="card shadow-lg rcorners">
         <div class="text-center p-3">
         <img alt="GitHub logo" class="h-30 " src="../assets/gh-logo.png">
