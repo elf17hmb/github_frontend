@@ -1,11 +1,11 @@
 <template>
-  <div class="container h-100 d-flex justify-content-center align-items-center">
+  <div class="container h-100 d-flex justify-content-center align-items-center loginbg">
       <div class="card shadow-lg rcorners">
         <div class="text-center p-3">
         <img alt="GitHub logo" class="h-30 " src="../assets/gh-logo.png">
         </div>
         <div class="card-body">
-          <div class="card-title text-center mt-3" style="width:18rem;">
+          <div class="card-title text-center mt-3" style="max-width:18rem;">
             <h5>GitHub Frontend</h5>
           </div>
           <p class="mt-5">
@@ -18,6 +18,7 @@
 </template>
 
 <script>
+import router from '../router'
 import API_Service from '../services/API'
 export default {
 
@@ -28,12 +29,15 @@ export default {
   },
 
   methods: {
-    persist(){
-      sessionStorage.patoken = this.patoken;
-      API_Service.getCurrentUser().then(response => {
-        console.log("GET USER RESPONSE: ", response.data)
-      })
-      this.$router.push('')
+    async persist(){
+      try{
+        sessionStorage.patoken = this.patoken; 
+        const response = await API_Service.getCurrentUser();
+        console.log(response);
+        router.push({name: 'Home'})
+      } catch (err) {
+        console.log(err);
+      }
     }
   }
 
@@ -41,6 +45,9 @@ export default {
 </script>
 
 <style scoped>
+.loginbg {
+    background-color: rgb(0, 59, 111);
+}
 .rcorners{
   border-radius: 25px;
 }

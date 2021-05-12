@@ -20,7 +20,6 @@ body, html {
   text-align: center;
   color: #2c3e50;
   height:100%;
-    background-color: rgb(0, 59, 111);
 
 }
 

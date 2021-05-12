@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Home from '../views/Home.vue'
 import Login from '../views/Login.vue'
+import API_Service from '../services/API'
 
 const routes = [
   {
@@ -32,11 +33,14 @@ const router = createRouter({
 
 export default router
 
-router.beforeEach((to,from,next) => {
+router.beforeEach(async (to,from,next) => {
   const publicPages = ['/login']
   const isPrivatePage = !publicPages.includes(to.path)
-  
-  if(isPrivatePage && !sessionStorage.getItem('patoken')){
+  if(to.path == '/login'){
+    sessionStorage.removeItem('patoken')
+  }
+  const isTokenValid = await API_Service.checkTokenStatus();
+  if(isPrivatePage && !sessionStorage.getItem('patoken') && !isTokenValid){
     return next({name:'Login'})
   } else {
     next()
