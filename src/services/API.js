@@ -37,5 +37,34 @@ class API_Service {
                 console.log(error)
             })
     }
+
+    getUser(username){
+        return axios
+            .get(API_URL + '/users/' + username)
+            .then(response => {
+                console.log('Got the searched user: ', response)
+                return response
+            })
+            .catch(error => {
+                console.log(error)
+            })
+    }
+
+    async inviteUser(orgName,userId){
+        console.log("Tried inviting user: " + userId + " to the org: " + orgName)
+
+        try{
+            let response = await axios({
+                method: 'post',
+                url: API_URL + '/orgs/' + orgName + '/invitations',
+                data:{invitee_id:userId}
+            })
+            return response
+        } catch(error){
+            console.log(error)
+        }
+
+
+    }
 }
 export default new API_Service;
