@@ -46,7 +46,7 @@ router.beforeEach(async (to,from,next) => {
   if(to.path == '/login'){
     sessionStorage.removeItem('patoken')
   }
-  const isTokenValid = await API_Service.checkTokenStatus();
+  const isTokenValid = await API_Service.checkTokenStatus(); //TODO: remove as soon as proper error handling is implemented
   if(isPrivatePage && !sessionStorage.getItem('patoken') && !isTokenValid){
     return next({name:'Login'})
   } else {

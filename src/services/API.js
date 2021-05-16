@@ -17,7 +17,7 @@ class API_Service {
 
         try {
             const response = await this.getCurrentUser();
-            console.log("Checking token status: ",response.status)
+            console.log("Checking token status: ", response.status)
         } catch(err){
             console.log(err);
             sessionStorage.removeItem('patoken')
