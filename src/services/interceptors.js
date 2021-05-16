@@ -1,5 +1,6 @@
 
 import axios from 'axios'
+import toast from './toast';
 // import API_Service from '../services/API'
 export function interceptors() {
     axios.interceptors.request.use(
@@ -10,10 +11,13 @@ export function interceptors() {
             }
 
             return config;
+        },
+        (error) => {
+            toast.apiError(error);
         });
 
     axios.interceptors.response.use(null, (error) => {
-            console.log("ERROR HAPPENED: " + error)
-        }
+        toast.apiError(error);
+    }
     )
 }

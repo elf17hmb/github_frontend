@@ -12,7 +12,7 @@
           <input type="text" class="rounded-pill" v-model="patoken" />
         </p>
         <button @click="persist" class="btn btn-primary rounded-pill">Sign in via GitHub</button>
-        <p><a href="https://github.com/settings/tokens" class="small">https://github.com/settings/tokens</a></p>
+        <p><a href="https://github.com/settings/tokens" target="_blank" class="small">https://github.com/settings/tokens</a></p>
       </div>
     </div>
   </div>
