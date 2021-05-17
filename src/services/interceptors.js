@@ -14,10 +14,12 @@ export function interceptors() {
         },
         (error) => {
             toast.apiError(error);
+            return Promise.reject(error.message)
         });
 
     axios.interceptors.response.use(null, (error) => {
         toast.apiError(error);
+        return Promise.reject(error.message)
     }
     )
 }

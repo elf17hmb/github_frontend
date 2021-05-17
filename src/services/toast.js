@@ -17,6 +17,11 @@ const toast = {
             position: 'bottomLeft'
         });
     },
+    apiSuccess: (response,message, title= 'Success') =>{
+        if(response.status == 200){
+            toast.success(message,title)
+        }
+    },
     apiError: (error, title = 'Fehler') => {
 
         if (error.response) {

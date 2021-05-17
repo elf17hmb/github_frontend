@@ -21,6 +21,7 @@
 <script>
 import router from '../router'
 import API_Service from '../services/API'
+import toast from '../services/toast'
 export default {
   data() {
     return {
@@ -33,7 +34,9 @@ export default {
       try {
         sessionStorage.patoken = this.patoken
         const response = await API_Service.getCurrentUser()
-        console.log(response)
+        if(response.status == 200){
+          toast.apiSuccess(response, 'valid Personal Access Token')
+        }
         router.push({ name: 'Home' })
       } catch (err) {
         console.log(err)
