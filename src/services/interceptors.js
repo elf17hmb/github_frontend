@@ -18,8 +18,10 @@ export function interceptors() {
         });
 
     axios.interceptors.response.use(null, (error) => {
+        if(Object.prototype.hasOwnProperty.call(error.config,'handleError') && error.config.handleError === false){
+            return Promise.reject(error)
+        }
         toast.apiError(error);
-        return Promise.reject(error.message)
     }
     )
 }

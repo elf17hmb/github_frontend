@@ -28,6 +28,7 @@
 <script>
 import API_Service from '../services/API'
 import User_List from '../components/User_List.vue'
+import toast from '../services/toast'
 
 export default {
   data() {
@@ -52,21 +53,25 @@ export default {
   methods: {
     inviteUsers() {
       this.users.forEach((user) => {
-        API_Service.inviteUser(this.selected, user.id).then((response) => {
-          console.log(response)
-        })
+        API_Service.inviteUser(this.selected, user.id)
+          .then((response) => {
+            toast.apiSuccess(response, user.login + ' was invited')
+          })
+          .catch((error) => {
+            toast.error(user.login + ' was not invited! \n Status: ' + error.response.status)
+          })
       })
     },
     lookUpUsers(names) {
       let promises = []
       names.forEach((name) => {
         promises.push(
-          API_Service.getUser(name)
+          API_Service.getUser(name, false)
             .then((response) => {
               this.users.push(response.data)
             })
             .catch((error) => {
-              console.log('User not found: ', error)
+              toast.error(name + ' was not found! Status: ' + error.response.status)
             })
         )
       })
@@ -80,12 +85,13 @@ export default {
       //   this.users = []
       let str = ghnames
       let names = str.split(/\r?\n/)
-      names = names
+      names = names //trimming names and deleting empty names
         .map((name) => name.trim())
         .filter((name) => {
           return name != null && name != ''
-        }) //trimming names and deleting empty names
-      if (this.users) { //filtering out duplicates
+        })
+      if (this.users) {
+        //filtering out duplicates
         names = names.filter((name) => {
           return !this.users.some((user) => user.login === name)
         })

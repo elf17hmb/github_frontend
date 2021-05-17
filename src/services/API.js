@@ -38,33 +38,23 @@ class API_Service {
             })
     }
 
-    getUser(username){
+    getUser(username, _handleError = true){
         return axios
-            .get(API_URL + '/users/' + username)
+            .get(API_URL + '/users/' + username, {handleError:_handleError})
             .then(response => {
                 console.log('Got the searched user: ', response)
                 return response
             })
-            .catch(error => {
-                console.log(error)
-            })
     }
 
     async inviteUser(orgName,userId){
-        console.log("Tried inviting user: " + userId + " to the org: " + orgName)
-
-        try{
             let response = await axios({
                 method: 'post',
                 url: API_URL + '/orgs/' + orgName + '/invitations',
-                data:{invitee_id:userId}
+                data:{invitee_id:userId},
+                handleError:false
             })
             return response
-        } catch(error){
-            console.log(error)
-        }
-
-
     }
 }
 export default new API_Service;

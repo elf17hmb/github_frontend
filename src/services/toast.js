@@ -18,25 +18,25 @@ const toast = {
         });
     },
     apiSuccess: (response,message, title= 'Success') =>{
-        if(response.status == 200){
-            toast.success(message,title)
-        }
+        // if(response.status == 200){
+            toast.success(message + ' status: ' + response.status,title)
+        // }
     },
     apiError: (error, title = 'Fehler') => {
 
         if (error.response) {
 
             if (error.response.data.message) {
-                console.log("Received response error message: " + error.response.data.message);
-                toast.error(error.response.data.message, title);
+                // console.log("Received response error message: " + error.response.data.message);
+                toast.error(error.response.status + ':' + error.response.data.message, title);
             } else {
                 toast.error("GitHub-API responded with an error", title);
             }
         } else if (error.request) {
             toast.error("Failed request", title);
         } else {
-            console.log("" + error.message);
-            toast.error(error.message);
+            // console.log("" + error.message);
+            toast.error(error.status);
         }
     }
 }
