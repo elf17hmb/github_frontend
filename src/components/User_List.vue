@@ -38,7 +38,7 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button @click="parseNames" class="btn btn-primary" data-bs-dismiss="modal">
+          <button @click="submitNames" class="btn btn-primary" data-bs-dismiss="modal">
             <div v-if="loading">
               <span class="spinner-border spinner-border-sm"></span>
               Loading...
@@ -52,51 +52,24 @@
 </template>
 
 <script>
-import API_Service from '../services/API'
-
 export default {
+  emits: ['submitNames'],
+  props: {
+    loading: {
+      type: Boolean,
+      default: false
+    },
+    users: Array
+  },
   data() {
     return {
-      ghnames: '',
-      users: [],
-      loading: false
+      ghnames: ''
     }
   },
   methods: {
-    lookUpUsers(names) {
-      let promises = []
-      names.forEach((name) => {
-        promises.push(
-          API_Service.getUser(name)
-            .then((response) => {
-              this.users.push(response.data)
-            })
-            .catch((error) => {
-              console.log('User not found: ', error)
-            })
-        )
-      })
-      Promise.all(promises).then(() => {
-        console.log('Loading users finished!')
-        this.loading = false
-      })
-    },
-    parseNames() {
-      this.loading = true
-      //   this.users = []
-      let str = this.ghnames
-      let names = str.split(/\r?\n/)
+    submitNames() {
+      this.$emit('submitNames', this.ghnames)
       this.ghnames = ''
-
-      names = names
-        .map((name) => name.trim())
-        .filter((name) => {
-          return name != null && name != ''
-        }) //trimming names and deleting empty names
-        names = names.filter((name) => {
-            return !this.users.includes(name) //don't include duplicates
-        })
-      this.lookUpUsers(names)
     }
   }
 }
