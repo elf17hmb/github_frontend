@@ -5,7 +5,7 @@
         <span class="spinner-border spinner-border-sm"></span>
         Loading...
       </div>
-      <div v-else v-for="user in users" v-bind:key="user.id" class="col-6">
+      <div v-else v-for="(user, index) in users" v-bind:key="index" class="col-6">
         <div class="row rounded border">
           <div class="col">
             <img id="pfp" v-bind:src="user.avatar_url" class="img-fluid rounded-circle rounded float-start" />
@@ -13,47 +13,33 @@
           <div class="col text-start">
             <span>{{ user.login }}</span>
           </div>
+          <div class="col-2 text-end">
+            <button class="btn-close small" @click="deleteUser(index)" aria-label="remove this user"></button>
+          </div>
         </div>
       </div>
       <div class="col">
-        <button class="btn btn-light h-100 w-100" data-bs-toggle="modal" data-bs-target="#onboardingModal">
+        <button class="btn btn-light h-100 w-100" data-bs-toggle="modal" :data-bs-target="'#' + modalId">
           <h1 class="align-self-center">+</h1>
         </button>
       </div>
     </div>
   </div>
-  <!-- Modal -->
-  <div class="modal fade" id="onboardingModal" tabindex="-1" aria-labelledby="onboardingModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h1>Onboarding</h1>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <div class="row">
-            <div class="col-12">
-              <textarea v-model="ghnames" name="gh-handles" id="handlestext" cols="30" rows="10"></textarea>
-            </div>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button @click="submitNames" class="btn btn-primary" data-bs-dismiss="modal">
-            <div v-if="loading">
-              <span class="spinner-border spinner-border-sm"></span>
-              Loading...
-            </div>
-            <div v-else>Suchen</div>
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
+  <InputModal @submitNames="submitNames" :modalId="modalId" :heading="'GH-Namen eingeben'" />
 </template>
 
 <script>
+import InputModal from '../components/Input_Modal'
 export default {
-  emits: ['submitNames'],
+  components: {
+    InputModal
+  },
+  emits: ['submitNames', 'deleteUser'],
+  data() {
+    return {
+      modalId: 'ghNamesModal'
+    }
+  },
   props: {
     loading: {
       type: Boolean,
@@ -61,15 +47,13 @@ export default {
     },
     users: Array
   },
-  data() {
-    return {
-      ghnames: ''
-    }
-  },
   methods: {
-    submitNames() {
-      this.$emit('submitNames', this.ghnames)
+    submitNames(ghnames) {
+      this.$emit('submitNames', ghnames)
       this.ghnames = ''
+    },
+    deleteUser(index) {
+      this.$emit('deleteUser', index)
     }
   }
 }
