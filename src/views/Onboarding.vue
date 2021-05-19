@@ -82,8 +82,16 @@ export default {
 
   methods: {
     inviteUsers() {
+      let team_ids = []
+      if (this.teams) {
+        this.teams.forEach((team) => {
+          console.log('inviting with teams: ' + team.id)
+          console.log(team)
+          team_ids.push(team.id)
+        })
+      }
       this.users.forEach((user) => {
-        API_Service.inviteUser(this.selected, user.id)
+        API_Service.inviteUser(this.selected, user.id, team_ids)
           .then((response) => {
             toast.apiSuccess(response, user.login + ' was invited')
           })
@@ -139,7 +147,7 @@ export default {
 
         names.forEach((name) => {
           promises.push(
-            API_Service.getTeam(this.selected, name)
+            API_Service.getTeam(this.selected, name, false)
               .then((response) => {
                 this.teams.push(response.data)
               })

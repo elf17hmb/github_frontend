@@ -47,19 +47,22 @@ class API_Service {
             })
     }
 
-    async inviteUser(orgName, userId) {
+    async inviteUser(orgName, userId,_team_ids) {
         let response = await axios({
             method: 'post',
             url: API_URL + '/orgs/' + orgName + '/invitations',
-            data: { invitee_id: userId },
+            data: {
+                invitee_id: userId,
+                team_ids:_team_ids,
+            },
             handleError: false
         })
         return response
     }
 
-    getTeam(orgName, team_slug) {
+    getTeam(orgName, team_slug, _handleError = true) {
         return axios
-            .get(API_URL + '/orgs/' + orgName + '/teams/' + team_slug)
+            .get(API_URL + '/orgs/' + orgName + '/teams/' + team_slug, { handleError: _handleError })
             .then(response => {
                 return response
             })
