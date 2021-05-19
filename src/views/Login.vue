@@ -19,7 +19,6 @@
 </template>
 
 <script>
-import router from '../router'
 import API_Service from '../services/API'
 import toast from '../services/toast'
 export default {
@@ -39,7 +38,7 @@ export default {
           sessionStorage.login = response.data.login
           toast.apiSuccess(response, 'valid Personal Access Token')
         }
-        router.push({ name: 'Home' })
+        this.$router.push({ name: 'Home' })
       } catch (err) {
         console.log(err)
       }

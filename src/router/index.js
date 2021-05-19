@@ -27,7 +27,8 @@ const routes = [
   {
     path: '/onboarding',
     name: 'Onboarding',
-    component: Onboarding
+    component: Onboarding,
+    props:true
   },
 ]
 

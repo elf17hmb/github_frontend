@@ -1,14 +1,14 @@
 <template>
   <div class="border mt-5">
-    <div class="row m-2 gy-3 gx-5">
+    <div class="row m-2 g-3">
       <div v-if="loading">
         <span class="spinner-border spinner-border-sm"></span>
         Loading...
       </div>
-      <div v-else v-for="(user, index) in users" v-bind:key="index" class="col-6">
-        <div class="row rounded border">
+      <div v-else v-for="(user, index) in users" v-bind:key="index" class="col-6 rounded border">
+        <div class="row">
           <div class="col">
-            <img id="pfp" v-bind:src="user.avatar_url" class="img-fluid rounded-circle rounded float-start" />
+            <img id="pfp" v-bind:src="user.avatar_url" width="40" class="img-fluid rounded-circle rounded float-start" />
           </div>
           <div class="col text-start">
             <span>{{ user.login }}</span>
@@ -18,11 +18,11 @@
           </div>
         </div>
       </div>
-      <div class="col">
-        <button class="btn btn-light h-100 w-100" data-bs-toggle="modal" :data-bs-target="'#' + modalId">
+      <!-- <div class="col"> -->
+        <button class="btn btn-outline-secondary h-100 w-100" data-bs-toggle="modal" :data-bs-target="'#' + modalId">
           <h1 class="align-self-center">+</h1>
         </button>
-      </div>
+      <!-- </div> -->
     </div>
   </div>
   <InputModal @submitNames="submitNames" :modalId="modalId" :heading="'GH-Namen eingeben'" />
@@ -60,7 +60,4 @@ export default {
 </script>
 
 <style scoped>
-#pfp {
-  width: 4rem;
-}
 </style>

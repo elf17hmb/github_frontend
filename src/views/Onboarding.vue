@@ -5,20 +5,21 @@
         <UserList @submitNames="lookUpUsers" @deleteUser="deleteUser" :users="users" />
       </div>
       <div class="col-12 mt-3">
-        <h3>Gefundene Nutzer in die Organisation einladen</h3>
+        <h3>Invite found Users to an organization:</h3>
       </div>
-      <div class="col-6">
-        <select name="" id="" class="form-select" v-model="selected" @change="getTeams">
+      <div class="col-6 text-start">
+        <label for="organizations" class="small">Organizations:</label>
+        <select name="" id="" class="form-select" v-model="selected" @change="emptyTeams" aria-label="organizations">
           <option disabled selected value="">Organisation auswählen</option>
           <option v-for="org in orgs" v-bind:key="org.id" v-bind:value="org.login">
             {{ org.login }}
           </option>
         </select>
       </div>
-      <div class="col-6">
-        <div class="form-check form-switch text-start">
-          <input class="form-check-input" type="checkbox" id="inviteToTeamSwitch" v-model="isTeamInviteActive" @change="getTeams" />
-          <label for="inviteToTeamSwitch" class="form-check-label"> Invite into a team</label>
+      <div class="col-6 d-flex justify-content-center align-items-center">
+        <div class="form-check form-switch ">
+          <input class="form-check-input" type="checkbox" id="inviteToTeamSwitch" v-model="isTeamInviteActive" />
+          <label for="inviteToTeamSwitch" class="form-check-label"> Invite into teams</label>
         </div>
       </div>
 
@@ -34,7 +35,7 @@
               </div>
             </li>
             <li class="list-group-item">
-              <button class="btn btn-light w-100" data-bs-toggle="modal" :data-bs-target="'#' + modalId">+</button>
+              <button class="btn btn-outline-primary w-100" data-bs-toggle="modal" :data-bs-target="'#' + modalId">+</button>
             </li>
           </ul>
         </div>
@@ -42,7 +43,7 @@
       </div>
 
       <div class="col">
-        <button @click="inviteUsers" class="btn btn-primary">Einladen</button>
+        <button @click="inviteUsers" class="btn btn-primary">Invite</button>
       </div>
     </div>
   </div>
@@ -67,6 +68,13 @@ export default {
     }
   },
 
+  props:{
+    selectOrgName:{
+      type:String,
+      default: 'LOL'
+    },
+  },
+
   components: {
     UserList,
     InputModal
@@ -76,6 +84,9 @@ export default {
     API_Service.getUserOrgs().then((response) => {
       this.orgs = response.data
     })
+    if(this.selectOrgName && this.selectOrgName != ''){
+      this.selected = this.selectOrgName
+    }
   },
 
   methods: {
@@ -166,6 +177,9 @@ export default {
     },
     deleteUser(index) {
       this.users.splice(index, 1)
+    },
+    emptyTeams(){
+      this.teams.length = 0
     }
   }
 }
