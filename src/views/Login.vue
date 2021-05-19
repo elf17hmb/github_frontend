@@ -35,6 +35,8 @@ export default {
         sessionStorage.patoken = this.patoken
         const response = await API_Service.getCurrentUser()
         if(response.status == 200){
+          sessionStorage.avatar_url = response.data.avatar_url
+          sessionStorage.login = response.data.login
           toast.apiSuccess(response, 'valid Personal Access Token')
         }
         router.push({ name: 'Home' })

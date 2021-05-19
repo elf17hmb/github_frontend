@@ -45,8 +45,6 @@
         <button @click="inviteUsers" class="btn btn-primary">Einladen</button>
       </div>
     </div>
-    <span>Selected: {{ selected }}</span>
-    <span>Checked: {{ isTeamInviteActive }}</span>
   </div>
 </template>
 

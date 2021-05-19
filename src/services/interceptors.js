@@ -1,6 +1,7 @@
 
 import axios from 'axios'
-import toast from './toast';
+import toast from './toast'
+import router from '../router'
 // import API_Service from '../services/API'
 export function interceptors() {
     axios.interceptors.request.use(
@@ -18,7 +19,10 @@ export function interceptors() {
         });
 
     axios.interceptors.response.use(null, (error) => {
-        if(Object.prototype.hasOwnProperty.call(error.config,'handleError') && error.config.handleError === false){
+        if (error.response.status === 401) {
+            router.push({ name: 'Login' })
+        }
+        if (Object.prototype.hasOwnProperty.call(error.config, 'handleError') && error.config.handleError === false && error.response.status != 401) {
             return Promise.reject(error)
         }
         toast.apiError(error);
