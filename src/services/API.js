@@ -47,5 +47,19 @@ class API_Service {
                 return response
             })
     }
+
+    async createTeam(_name, org, _parent_team_id){
+        console.log("Trying to create team: " + _name +" in org: " + org  + " under Team: " + _parent_team_id)
+        const response = await axios({
+            method : 'post',
+            url: API_URL + '/orgs/' + org + '/teams',
+            data: {
+                name: _name,
+                parent_team_id: _parent_team_id,
+                privacy: 'closed'
+            },
+        })
+        return response
+    }
 }
 export default new API_Service;
