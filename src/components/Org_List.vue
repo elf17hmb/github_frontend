@@ -12,8 +12,8 @@
             </div>
             <div class="col text-end">
               <div class="d-grid gap-2 d-flex justify-content-end">
-                <button class="btn btn-outline-secondary btn-sm">Repo search</button>
-                <button class="btn btn-outline-primary btn-sm" @click="goToOnboarding(org.login)"><span class="rounded-circle">+</span><span>Onboarding</span></button>
+                <button class="btn btn-outline-secondary btn-sm" @click="goToCreateProject(org.login)">Projekt erstellen</button>
+                <button class="btn btn-outline-primary btn-sm" @click="goToOnboarding(org.login)"><span>+ Onboarding</span></button>
               </div>
             </div>
           </div>
@@ -45,6 +45,9 @@ export default {
     goToOnboarding(orgName) {
       console.log('GO TO ONBOARDING WITH ORG: ' + orgName)
       this.$router.push({ name: 'Onboarding', params: { selectOrgName: orgName } })
+    },
+    goToCreateProject(orgName) {
+      this.$router.push({ name: 'CreateProject', params: { orgName: orgName } })
     }
   }
 }
