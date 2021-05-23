@@ -45,6 +45,10 @@
       <div class="col">
         <button @click="inviteUsers" class="btn btn-primary">Invite</button>
       </div>
+
+      <div class="col-12">
+        <button class="btn btn-primary" @click="getAllTeams"> GET ALL TEAMS</button>
+      </div>
     </div>
   </div>
 </template>
@@ -180,6 +184,17 @@ export default {
     },
     emptyTeams(){
       this.teams.length = 0
+    },
+    async getAllTeams(){
+      const lastPagePrefix = '&page='
+      const lastPageStringPartTwo = '>; rel="last"'
+
+      const firstRequest =  await API_Service.listTeams(this.selected)
+      console.log("GETTING TEAMS: ")
+      console.log(firstRequest)
+      const headerLinkPagination = firstRequest.headers.link.toString()
+      const lastPage = headerLinkPagination.substr(headerLinkPagination.lastIndexOf(lastPagePrefix) + lastPagePrefix.length, headerLinkPagination.lastIndexOf(lastPageStringPartTwo))
+      console.log("LAST PAGE NUMBER: " + lastPage);
     }
   }
 }

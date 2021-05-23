@@ -61,5 +61,16 @@ class API_Service {
         })
         return response
     }
+
+    async listTeams (org){
+        const response = await axios({
+            method: 'get',
+            url: API_URL + '/orgs/' + org + '/teams',
+            params: {
+                per_page: 100,
+            }
+        })
+        return response
+    }
 }
 export default new API_Service;
