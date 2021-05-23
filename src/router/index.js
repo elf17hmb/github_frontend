@@ -48,16 +48,16 @@ const router = createRouter({
 
 export default router
 
-router.beforeEach(async (to) => {
-  // const publicPages = ['/login']
-  // const isPrivatePage = !publicPages.includes(to.path)
+router.beforeEach(async (to, from, next) => {
+  const publicPages = ['/login']
+  const isPrivatePage = !publicPages.includes(to.path)
   if (to.path == '/login') {
     sessionStorage.removeItem('patoken')
   }
   // const isTokenValid = await API_Service.checkTokenStatus();
-  // if (isPrivatePage && !sessionStorage.getItem('patoken') && !isTokenValid) {
-  //   return next({ name: 'Login' })
-  // } else {
-  //   next()
-  // }
+  if (isPrivatePage && !sessionStorage.getItem('patoken')) {
+    return next({ name: 'Login' })
+  } else {
+    next()
+  }
 })
