@@ -18,7 +18,7 @@
       </div>
       <div class="col-6 d-flex justify-content-center align-items-center">
         <div class="form-check form-switch ">
-          <input class="form-check-input" type="checkbox" id="inviteToTeamSwitch" v-model="isTeamInviteActive" />
+          <input class="form-check-input" type="checkbox" id="inviteToTeamSwitch" v-model="isTeamInviteActive" @change="emptyTeams"/>
           <label for="inviteToTeamSwitch" class="form-check-label"> Invite into teams</label>
         </div>
       </div>
@@ -46,9 +46,10 @@
         <button @click="inviteUsers" class="btn btn-primary">Invite</button>
       </div>
 
-      <div class="col-12">
+      <!-- For testing purposes: -->
+      <!-- <div class="col-12">
         <button class="btn btn-primary" @click="getAllTeams"> GET ALL TEAMS</button>
-      </div>
+      </div> -->
     </div>
   </div>
 </template>
@@ -185,17 +186,17 @@ export default {
     emptyTeams(){
       this.teams.length = 0
     },
-    async getAllTeams(){
-      const lastPagePrefix = '&page='
-      const lastPageStringPartTwo = '>; rel="last"'
+    // async getAllTeams(){
+    //   const lastPagePrefix = '&page='
+    //   const lastPageStringPartTwo = '>; rel="last"'
 
-      const firstRequest =  await API_Service.listTeams(this.selected)
-      console.log("GETTING TEAMS: ")
-      console.log(firstRequest)
-      const headerLinkPagination = firstRequest.headers.link.toString()
-      const lastPage = headerLinkPagination.substr(headerLinkPagination.lastIndexOf(lastPagePrefix) + lastPagePrefix.length, headerLinkPagination.lastIndexOf(lastPageStringPartTwo))
-      console.log("LAST PAGE NUMBER: " + lastPage);
-    }
+    //   const firstRequest =  await API_Service.listTeams(this.selected)
+    //   console.log("GETTING TEAMS: ")
+    //   console.log(firstRequest)
+    //   const headerLinkPagination = firstRequest.headers.link.toString()
+    //   const lastPage = headerLinkPagination.substr(headerLinkPagination.lastIndexOf(lastPagePrefix) + lastPagePrefix.length, headerLinkPagination.lastIndexOf(lastPageStringPartTwo))
+    //   console.log("LAST PAGE NUMBER: " + lastPage);
+    // }
   }
 }
 </script>
