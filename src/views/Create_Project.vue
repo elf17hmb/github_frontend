@@ -42,21 +42,25 @@
                       <span>{{ user }}</span>
                     </div>
                     <div class="col text-end">
-                      <button class="btn-close small" @click="deleteMemberInTeam(uIndex,teamIndex)" aria-label="remove this team"></button>
+                      <button class="btn-close small" @click="deleteMemberInTeam(uIndex, teamIndex)" aria-label="remove this team"></button>
                     </div>
                   </div>
                 </li>
+                <li class="list-group-item">
+                  <button class="btn btn-outline-secondary w-100" data-bs-toggle="modal" :data-bs-target="'#' + memberInputModalId + teamIndex">+</button>
+                </li>
               </ul>
             </div>
+            <InputModal @submitNames="createMemberPreviews(teamIndex, $event)" :modalId="memberInputModalId + teamIndex" :heading="'GH-Namen eingeben'" />
           </li>
           <li class="list-group-item">
-            <button class="btn btn-outline-primary w-100" data-bs-toggle="modal" :data-bs-target="'#' + modalId">+</button>
+            <button class="btn btn-outline-primary w-100" data-bs-toggle="modal" :data-bs-target="'#' + teamInputModalId">+</button>
           </li>
         </ul>
       </div>
     </div>
   </div>
-  <InputModal @submitNames="createTeamPreviews" :modalId="modalId" :heading="'Teams eingeben'" />
+  <InputModal @submitNames="createTeamPreviews" :modalId="teamInputModalId" :heading="'Teams eingeben'" />
 </template>
 
 <script>
@@ -65,7 +69,8 @@ import InputModal from '../components/Input_Modal'
 export default {
   data() {
     return {
-      modalId: 'teamInputModal',
+      teamInputModalId: 'teamInputModal',
+      memberInputModalId: 'memberInputModal',
       teams: [],
       parentTeamString: '',
       parentTeam: null
@@ -113,6 +118,22 @@ export default {
       return teamsArray
     },
 
+    parseMemberInput(membersString) {
+      let names = membersString.split(/\r?\n/)
+      names = names //trimming names and deleting empty names
+        .map((name) => name.trim())
+        .filter((name) => {
+          return name != null && name != ''
+        })
+      if (this.teams) {
+        //filtering out duplicates
+        names = names.filter((name) => {
+          return !this.teams.some((team) => team.members.some((user) => user === name))
+        })
+      }
+      return names
+    },
+
     createTeamPreviews(teamString) {
       const teamsArray = this.parseTeamInput(teamString)
       teamsArray.forEach((team) => {
@@ -120,6 +141,13 @@ export default {
           name: 'Gruppe ' + this.teams.length,
           members: team
         })
+      })
+    },
+
+    createMemberPreviews(teamIndex, membersString) {
+      const memberNames = this.parseMemberInput(membersString)
+      memberNames.forEach((name) => {
+        this.teams[teamIndex].members.push(name)
       })
     },
 
@@ -137,8 +165,8 @@ export default {
       this.teams.splice(index, 1)
     },
 
-    deleteMemberInTeam(uIndex,teamIndex) {
-      this.teams[teamIndex].members.splice(uIndex,1)
+    deleteMemberInTeam(uIndex, teamIndex) {
+      this.teams[teamIndex].members.splice(uIndex, 1)
     }
   }
 }
