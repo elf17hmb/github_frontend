@@ -14,9 +14,9 @@
       <div id="paren_team_input" class="col mb-3 mt-3">
         <div class="row">
           <div class="col-auto text-start">
-              <label for="parentTeam" class="form-label">Übergeordnetes Team:</label>
-              <input id="parentTeam" v-model="parentTeamString" v-if="!parentTeam" type="text" class="form-control" placeholder="team_slug  (optional)" />
-              <h5 v-else>{{ parentTeam.slug }}</h5>
+            <label class="form-label">Übergeordnetes Team:</label>
+            <input id="parentTeam" v-model="parentTeamString" v-if="!parentTeam" type="text" class="form-control" placeholder="team_slug  (optional)" />
+            <h5 v-else>{{ parentTeam.slug }}</h5>
           </div>
           <div class="col-auto d-flex align-items-end">
             <button v-if="parentTeam === null" class="btn btn-outline-primary" @click="lookUpATeam(parentTeamString)">Suchen</button>
@@ -32,12 +32,19 @@
                 <h5>{{ team.name }}</h5>
               </div>
               <div class="col text-end">
-                <!-- <button class="btn-close small" @click="deleteTeam(index)" aria-label="remove this team"></button> -->
+                <button class="btn-close small" @click="deleteTeam(teamIndex)" aria-label="remove this team"></button>
               </div>
               <label for="memberlist" class="text-start">Mitglieder:</label>
               <ul id="memberlist" class="list-group">
                 <li class="list-group-item list-group-item-secondary" v-for="(user, uIndex) in team.members" :key="uIndex">
-                  <span>{{ user }}</span>
+                  <div class="row">
+                    <div class="col text-start">
+                      <span>{{ user }}</span>
+                    </div>
+                    <div class="col text-end">
+                      <button class="btn-close small" @click="deleteMemberInTeam(uIndex,teamIndex)" aria-label="remove this team"></button>
+                    </div>
+                  </div>
                 </li>
               </ul>
             </div>
@@ -124,6 +131,14 @@ export default {
 
     removeParentTeam() {
       this.parentTeam = null
+    },
+
+    deleteTeam(index) {
+      this.teams.splice(index, 1)
+    },
+
+    deleteMemberInTeam(uIndex,teamIndex) {
+      this.teams[teamIndex].members.splice(uIndex,1)
     }
   }
 }
