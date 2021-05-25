@@ -16,11 +16,17 @@
           <div class="col-auto text-start">
             <label class="form-label">Übergeordnetes Team:</label>
             <input id="parentTeam" v-model="parentTeamString" v-if="!parentTeam" type="text" class="form-control" placeholder="team_slug  (optional)" />
-            <h5 v-else>{{ parentTeam.slug }}</h5>
+            <a v-else :href="parentTeam.html_url" target="_blank" class="btn btn-light w-100 text-start">{{ parentTeam.slug }}</a>
           </div>
           <div class="col-auto d-flex align-items-end">
-            <button v-if="parentTeam === null" class="btn btn-outline-primary" @click="lookUpATeam(parentTeamString)">Suchen</button>
+            <button v-if="parentTeam === null" class="btn btn-outline-primary" @click="lookUpParentTeam(parentTeamString)">Suchen</button>
             <button v-else class="btn btn-close" @click="removeParentTeam"></button>
+          </div>
+          <div class="col-auto">
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" id="inviteToTeamSwitch" v-model="generateRepos" />
+              <label for="inviteToTeamSwitch" class="form-check-label"> Repositories anlegen</label>
+            </div>
           </div>
         </div>
       </div>
@@ -29,7 +35,7 @@
           <li class="list-group-item" v-for="(team, teamIndex) in teams" :key="teamIndex" :value="teamIndex">
             <div class="row">
               <div class="col-8 text-start">
-                <h5>{{ team.name }}</h5>
+                <h5>{{ teamNamePrefix + team.name }}</h5>
               </div>
               <div class="col text-end">
                 <button class="btn-close small" @click="deleteTeam(teamIndex)" aria-label="remove this team"></button>
@@ -50,10 +56,20 @@
                   <button class="btn btn-outline-secondary w-100" data-bs-toggle="modal" :data-bs-target="'#' + memberInputModalId + teamIndex">+</button>
                 </li>
               </ul>
+              <label for="repolist" class="mt-2 mb-2 text-start">Repositories:</label>
+              <ul id="reporist" class="list-group">
+                <li class="list-group-item" v-for="(repo, repoIndex) in teams[teamIndex].repos" :key="repoIndex">
+                  <div class="row">
+                    <div class="col text-start">
+                      <span>{{ teamNamePrefix + repo.name }}</span>
+                    </div>
+                  </div>
+                </li>
+              </ul>
             </div>
             <InputModal @submitNames="createMemberPreviews(teamIndex, $event)" :modalId="memberInputModalId + teamIndex" :heading="'GH-Namen eingeben'" />
           </li>
-          <li class="list-group-item">
+          <li class="list-group-item p-1">
             <button class="btn btn-outline-primary w-100" data-bs-toggle="modal" :data-bs-target="'#' + teamInputModalId">+</button>
           </li>
         </ul>
@@ -73,7 +89,9 @@ export default {
       memberInputModalId: 'memberInputModal',
       teams: [],
       parentTeamString: '',
-      parentTeam: null
+      parentTeam: null,
+      generateRepos: true,
+      teamNamePrefix: ''
     }
   },
   props: {
@@ -83,25 +101,25 @@ export default {
     InputModal
   },
   methods: {
-    async createTestTeams() {
-      console.log('CREATE TEAMS!')
-      const startingYear = 2018
-      const amountOfTeams = 20
-      const org = 'whz-informatik-projekt-ba-fluegel'
-      for (let i = 0; i < amountOfTeams; i++) {
-        const upperTeamName = '' + (startingYear - i)
-        const response = await API_Service.createTeam(upperTeamName, org)
-        console.log(response)
-        for (let j = 0; j < 2; j++) {
-          const middleTeamName = upperTeamName + '-PV' + (j + 1)
-          const middleResponse = await API_Service.createTeam(middleTeamName, org, response.data.id)
-          for (let k = 0; k < 5; k++) {
-            const lowerTeamName = middleTeamName + '-Gruppe ' + (k + 1)
-            await API_Service.createTeam(lowerTeamName, org, middleResponse.data.id)
-          }
-        }
-      }
-    },
+    // async createTestTeams() {
+    //   console.log('CREATE TEAMS!')
+    //   const startingYear = 2018
+    //   const amountOfTeams = 20
+    //   const org = 'whz-informatik-projekt-ba-fluegel'
+    //   for (let i = 0; i < amountOfTeams; i++) {
+    //     const upperTeamName = '' + (startingYear - i)
+    //     const response = await API_Service.createTeam(upperTeamName, org)
+    //     console.log(response)
+    //     for (let j = 0; j < 2; j++) {
+    //       const middleTeamName = upperTeamName + '-PV' + (j + 1)
+    //       const middleResponse = await API_Service.createTeam(middleTeamName, org, response.data.id)
+    //       for (let k = 0; k < 5; k++) {
+    //         const lowerTeamName = middleTeamName + '-Gruppe ' + (k + 1)
+    //         await API_Service.createTeam(lowerTeamName, org, middleResponse.data.id)
+    //       }
+    //     }
+    //   }
+    // },
 
     parseTeamInput(teamString) {
       // console.log('TEAM NAMES: ' + teamNames)
@@ -136,12 +154,20 @@ export default {
 
     createTeamPreviews(teamString) {
       const teamsArray = this.parseTeamInput(teamString)
-      teamsArray.forEach((team) => {
-        this.teams.push({
-          name: 'Gruppe ' + this.teams.length,
-          members: team
+      // let teamNamePrefix = ''
+      // if(this.parentTeam){
+      //   teamNamePrefix = this.parentTeam.slug + '-'
+      // }
+      // if (this.generateRepos) {
+        teamsArray.forEach((team) => {
+          const teamName = 'gruppe-' + this.teams.length
+
+          this.teams.push({
+            name: teamName,
+            members: team,
+            repos: this.generateRepos ? [{ name: teamName + '-repo' }] : []
+          })
         })
-      })
     },
 
     createMemberPreviews(teamIndex, membersString) {
@@ -151,14 +177,17 @@ export default {
       })
     },
 
-    lookUpATeam(team_slug) {
+    lookUpParentTeam(team_slug) {
       API_Service.getTeam(this.orgName, team_slug).then((response) => {
+        console.log('Got parent team: ', response)
         this.parentTeam = response.data
+        this.teamNamePrefix = this.parentTeam.slug + '-'
       })
     },
 
     removeParentTeam() {
       this.parentTeam = null
+      this.teamNamePrefix = ''
     },
 
     deleteTeam(index) {
@@ -167,7 +196,7 @@ export default {
 
     deleteMemberInTeam(uIndex, teamIndex) {
       this.teams[teamIndex].members.splice(uIndex, 1)
-    }
+    },
   }
 }
 </script>
