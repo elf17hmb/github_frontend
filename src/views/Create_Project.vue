@@ -31,43 +31,47 @@
         </div>
       </div>
       <div class="col-12">
-        <ul class="list-group">
-          <li class="list-group-item" v-for="(team, teamIndex) in teams" :key="teamIndex" :value="teamIndex">
-            <div class="row">
-              <div class="col-8 text-start">
-                <h5>{{ teamNamePrefix + team.name }}</h5>
-              </div>
-              <div class="col text-end">
-                <button class="btn-close small" @click="deleteTeam(teamIndex)" aria-label="remove this team"></button>
-              </div>
-              <label for="memberlist" class="text-start">Mitglieder:</label>
-              <ul id="memberlist" class="list-group">
-                <li class="list-group-item list-group-item-secondary" v-for="(user, uIndex) in team.members" :key="uIndex">
-                  <div class="row">
-                    <div class="col text-start">
-                      <span>{{ user }}</span>
-                    </div>
-                    <div class="col text-end">
-                      <button class="btn-close small" @click="deleteMemberInTeam(uIndex, teamIndex)" aria-label="remove this team"></button>
-                    </div>
-                  </div>
-                </li>
-                <li class="list-group-item">
-                  <button class="btn btn-outline-secondary w-100" data-bs-toggle="modal" :data-bs-target="'#' + memberInputModalId + teamIndex">+</button>
-                </li>
-              </ul>
-              <label for="repolist" class="mt-2 mb-2 text-start">Repositories:</label>
-              <ul id="reporist" class="list-group">
-                <li class="list-group-item" v-for="(repo, repoIndex) in teams[teamIndex].repos" :key="repoIndex">
-                  <div class="row">
-                    <div class="col text-start">
-                      <span>{{ teamNamePrefix + repo.name }}</span>
-                    </div>
-                  </div>
-                </li>
-              </ul>
+        <ul id="teamsList" class="list-group">
+          <li class="list-group-item text-start" v-for="(team, teamIndex) in teams" :key="teamIndex" :value="teamIndex">
+            <div class="d-flex w-100 justify-content-between">
+              <h5>Gruppenname: {{ teamNamePrefix + team.name }}</h5>
+              <button class="btn-close small" @click="deleteTeam(teamIndex)" aria-label="remove this team"></button>
             </div>
-            <InputModal @submitNames="createMemberPreviews(teamIndex, $event)" :modalId="memberInputModalId + teamIndex" :heading="'GH-Namen eingeben'" />
+            <label for="memberlist" class="text-start">Mitglieder:</label>
+            <ul id="memberlist" class="list-group">
+              <li class="list-group-item" v-for="(user, uIndex) in team.members" :key="uIndex">
+                <div class="row">
+                  <div class="col text-start">
+                    <span>{{ user }}</span>
+                  </div>
+                  <div class="col text-end">
+                    <button class="btn-close small" @click="deleteMemberInTeam(uIndex, teamIndex)" aria-label="remove this member"></button>
+                  </div>
+                </div>
+              </li>
+              <li class="list-group-item">
+                <button class="btn btn-outline-secondary w-100" data-bs-toggle="modal" :data-bs-target="'#' + memberInputModalId + teamIndex">+</button>
+              </li>
+            </ul>
+            <label for="repolist" class="mt-2 mb-2 text-start">Repositories:</label>
+            <ul id="reporist" class="list-group">
+              <li class="list-group-item" v-for="(repo, repoIndex) in teams[teamIndex].repos" :key="repoIndex">
+                <div class="row">
+                  <div class="col text-start">
+                    <span>{{ teamNamePrefix + repo.name }}</span>
+                  </div>
+                  <div class="col text-end">
+                    <button class="btn-close small" @click="deleteRepoInTeam(repoIndex, teamIndex)" aria-label="remove this repo"></button>
+                  </div>
+                </div>
+              </li>
+              <li id="addRepo" class="list-group-item">
+                <button class="btn btn-outline-secondary w-100" @click="addRepoPreview(teamIndex)">+</button>
+              </li>
+            </ul>
+            <div class="text-center">
+              <InputModal @submitNames="createMemberPreviews(teamIndex, $event)" :modalId="memberInputModalId + teamIndex" :heading="'GH-Namen eingeben'" />
+            </div>
           </li>
           <li class="list-group-item p-1">
             <button class="btn btn-outline-primary w-100" data-bs-toggle="modal" :data-bs-target="'#' + teamInputModalId">+</button>
@@ -159,15 +163,15 @@ export default {
       //   teamNamePrefix = this.parentTeam.slug + '-'
       // }
       // if (this.generateRepos) {
-        teamsArray.forEach((team) => {
-          const teamName = 'gruppe-' + this.teams.length
+      teamsArray.forEach((team) => {
+        const teamName = 'gruppe-' + this.teams.length
 
-          this.teams.push({
-            name: teamName,
-            members: team,
-            repos: this.generateRepos ? [{ name: teamName + '-repo' }] : []
-          })
+        this.teams.push({
+          name: teamName,
+          members: team,
+          repos: this.generateRepos ? [{ name: teamName + '-repo-' + 0 }] : []
         })
+      })
     },
 
     createMemberPreviews(teamIndex, membersString) {
@@ -197,6 +201,18 @@ export default {
     deleteMemberInTeam(uIndex, teamIndex) {
       this.teams[teamIndex].members.splice(uIndex, 1)
     },
+
+    deleteRepoInTeam(repoIndex, teamIndex) {
+      this.teams[teamIndex].repos.splice(repoIndex, 1)
+    },
+    addRepoPreview(teamIndex) {
+      let repoName = this.teams[teamIndex].name + '-repo-' + this.teams[teamIndex].repos.length
+      const timestamp = new Date().getUTCMilliseconds() //Temporary solution 
+      if(this.teams[teamIndex].repos.some(repo => repo.name === repoName)){
+        repoName = repoName + '-' + timestamp
+      }
+      this.teams[teamIndex].repos.push({ name:  repoName})
+    }
   }
 }
 </script>
