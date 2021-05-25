@@ -32,45 +32,51 @@
       </div>
       <div class="col-12">
         <ul id="teamsList" class="list-group">
-          <li class="list-group-item text-start" v-for="(team, teamIndex) in teams" :key="teamIndex" :value="teamIndex">
-            <div class="d-flex w-100 justify-content-between">
-              <h5>Gruppenname: {{ teamNamePrefix + team.name }}</h5>
-              <button class="btn-close small" @click="deleteTeam(teamIndex)" aria-label="remove this team"></button>
-            </div>
-            <label for="memberlist" class="text-start">Mitglieder:</label>
-            <ul id="memberlist" class="list-group">
-              <li class="list-group-item" v-for="(user, uIndex) in team.members" :key="uIndex">
-                <div class="row">
-                  <div class="col text-start">
-                    <span>{{ user }}</span>
-                  </div>
-                  <div class="col text-end">
-                    <button class="btn-close small" @click="deleteMemberInTeam(uIndex, teamIndex)" aria-label="remove this member"></button>
-                  </div>
-                </div>
-              </li>
-              <li class="list-group-item">
-                <button class="btn btn-outline-secondary w-100" data-bs-toggle="modal" :data-bs-target="'#' + memberInputModalId + teamIndex">+</button>
-              </li>
-            </ul>
-            <label for="repolist" class="mt-2 mb-2 text-start">Repositories:</label>
-            <ul id="reporist" class="list-group">
-              <li class="list-group-item" v-for="(repo, repoIndex) in teams[teamIndex].repos" :key="repoIndex">
-                <div class="row">
-                  <div class="col text-start">
-                    <span>{{ teamNamePrefix + repo.name }}</span>
-                  </div>
-                  <div class="col text-end">
-                    <button class="btn-close small" @click="deleteRepoInTeam(repoIndex, teamIndex)" aria-label="remove this repo"></button>
-                  </div>
-                </div>
-              </li>
-              <li id="addRepo" class="list-group-item">
-                <button class="btn btn-outline-secondary w-100" @click="addRepoPreview(teamIndex)">+</button>
-              </li>
-            </ul>
-            <div class="text-center">
-              <InputModal @submitNames="createMemberPreviews(teamIndex, $event)" :modalId="memberInputModalId + teamIndex" :heading="'GH-Namen eingeben'" />
+          <li class="list-group-item text-start border-2" v-for="(team, teamIndex) in teams" :key="teamIndex" :value="teamIndex">
+            <div class="row">
+              <div class="col-12 d-flex w-100 justify-content-between">
+                <h5>{{ teamNamePrefix + team.name }}</h5>
+                <button class="btn-close small" @click="deleteTeam(teamIndex)" aria-label="remove this team"></button>
+              </div>
+              <div class="col-12 col-md-6">
+                <label for="memberlist" class="text-start">Mitglieder:</label>
+                <ul id="memberlist" class="list-group">
+                  <li class="list-group-item" v-for="(user, uIndex) in team.members" :key="uIndex">
+                    <div class="row">
+                      <div class="col text-start">
+                        <span>{{ user }}</span>
+                      </div>
+                      <div class="col text-end">
+                        <button class="btn-close small" @click="deleteMemberInTeam(uIndex, teamIndex)" aria-label="remove this member"></button>
+                      </div>
+                    </div>
+                  </li>
+                  <li class="list-group-item">
+                    <button class="btn btn-outline-secondary w-100" data-bs-toggle="modal" :data-bs-target="'#' + memberInputModalId + teamIndex">+</button>
+                  </li>
+                </ul>
+              </div>
+              <div class="col-12 col-md-6 mt-2 mt-md-0">
+                <label for="repolist" class="text-start">Repositories:</label>
+                <ul id="reporist" class="list-group">
+                  <li class="list-group-item" v-for="(repo, repoIndex) in teams[teamIndex].repos" :key="repoIndex">
+                    <div class="row">
+                      <div class="col text-start">
+                        <span>{{ teamNamePrefix + repo.name }}</span>
+                      </div>
+                      <div class="col text-end">
+                        <button class="btn-close small" @click="deleteRepoInTeam(repoIndex, teamIndex)" aria-label="remove this repo"></button>
+                      </div>
+                    </div>
+                  </li>
+                  <li id="addRepo" class="list-group-item">
+                    <button class="btn btn-outline-secondary w-100" @click="addRepoPreview(teamIndex)">+</button>
+                  </li>
+                </ul>
+              </div>
+              <div class="text-center">
+                <InputModal @submitNames="createMemberPreviews(teamIndex, $event)" :modalId="memberInputModalId + teamIndex" :heading="'GH-Namen eingeben'" />
+              </div>
             </div>
           </li>
           <li class="list-group-item p-1">
@@ -127,13 +133,20 @@ export default {
 
     parseTeamInput(teamString) {
       // console.log('TEAM NAMES: ' + teamNames)
-      let teamsArray = teamString.split(/\r?\n/)
+      let teamsArray = teamString.split(/\r?\n/) //Splitting up the String by line breaks: amount of lines = length of array
       teamsArray = teamsArray
         .filter((team) => {
           return team.trim() != ''
         })
         .map((team) => {
-          return team.trim().split(',')
+          let teamObj = {}
+          let trimmedTeam = team.trim()
+          teamObj.name = trimmedTeam.substr(0, trimmedTeam.indexOf(':'))
+          let members = trimmedTeam.substr(trimmedTeam.indexOf(':') + 1, trimmedTeam.length)
+          teamObj.members = members.split(',').filter((member) => {
+            return member.trim() != ''
+          })
+          return teamObj
         })
       console.log('TEAMS length: ' + teamsArray.length)
       console.log(teamsArray)
@@ -164,11 +177,16 @@ export default {
       // }
       // if (this.generateRepos) {
       teamsArray.forEach((team) => {
-        const teamName = 'gruppe-' + this.teams.length
+        let teamName = ''
+        if (team.name) {
+          teamName = team.name
+        } else {
+          teamName = 'gruppe-' + this.teams.length
+        }
 
         this.teams.push({
           name: teamName,
-          members: team,
+          members: team.members,
           repos: this.generateRepos ? [{ name: teamName + '-repo-' + 0 }] : []
         })
       })
@@ -207,12 +225,12 @@ export default {
     },
     addRepoPreview(teamIndex) {
       let repoName = this.teams[teamIndex].name + '-repo-' + this.teams[teamIndex].repos.length
-      const timestamp = new Date().getUTCMilliseconds() //Temporary solution 
-      if(this.teams[teamIndex].repos.some(repo => repo.name === repoName)){
+      const timestamp = new Date().getUTCMilliseconds() //Temporary solution
+      if (this.teams[teamIndex].repos.some((repo) => repo.name === repoName)) {
         repoName = repoName + '-' + timestamp
       }
-      this.teams[teamIndex].repos.push({ name:  repoName})
-    }
+      this.teams[teamIndex].repos.push({ name: repoName })
+    },
   }
 }
 </script>
