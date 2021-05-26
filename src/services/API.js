@@ -59,6 +59,7 @@ class API_Service {
                 privacy: 'closed'
             },
         })
+        console.log("Created a team: ",response)
         return response
     }
 
@@ -71,6 +72,34 @@ class API_Service {
             }
         })
         return response
+    }
+
+    async updateTeamMembership(org, team_slug, username, _role){
+        console.log("Trying to update team membership for: " + username + " to: " + _role)
+        const response = await axios({
+            method: 'put',
+            url: API_URL + '/orgs/'+ org + '/teams/' + team_slug + '/memberships/' + username,
+            data: {
+                role:_role
+            }
+        })
+        return response
+    }
+
+    async createRepo(org,_name, _team_id){
+        
+        console.log("Trying to create a repo: " + _name + ' in org: ' + org + ' for team: ' + _team_id)
+        const response = await axios({
+            method:'post',
+            url: API_URL + '/orgs/' + org + '/repos',
+            data: {
+                name: _name,
+                private: true,
+                team_id: _team_id
+            }
+        })
+        return response
+
     }
 }
 export default new API_Service;

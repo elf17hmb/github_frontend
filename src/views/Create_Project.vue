@@ -84,6 +84,7 @@
           </li>
         </ul>
       </div>
+      <div><button class="btn btn-primary" @click="createTeams">Teams erstellen</button></div>
     </div>
   </div>
   <InputModal @submitNames="createTeamPreviews" :modalId="teamInputModalId" :heading="'Teams eingeben'" />
@@ -92,6 +93,8 @@
 <script>
 import API_Service from '../services/API'
 import InputModal from '../components/Input_Modal'
+import toast from '../services/toast'
+// import API from '../services/API'
 export default {
   data() {
     return {
@@ -101,7 +104,8 @@ export default {
       parentTeamString: '',
       parentTeam: null,
       generateRepos: true,
-      teamNamePrefix: ''
+      teamNamePrefix: '',
+      createdTeams: []
     }
   },
   props: {
@@ -143,9 +147,14 @@ export default {
           let trimmedTeam = team.trim()
           teamObj.name = trimmedTeam.substr(0, trimmedTeam.indexOf(':'))
           let members = trimmedTeam.substr(trimmedTeam.indexOf(':') + 1, trimmedTeam.length)
-          teamObj.members = members.split(',').filter((member) => {
-            return member.trim() != ''
-          })
+          teamObj.members = members
+            .split(',')
+            .filter((member) => {
+              return member.trim() != ''
+            })
+            .map((member) => {
+              return member.trim()
+            })
           return teamObj
         })
       console.log('TEAMS length: ' + teamsArray.length)
@@ -231,6 +240,38 @@ export default {
       }
       this.teams[teamIndex].repos.push({ name: repoName })
     },
+    createTeams() {
+      if (this.teams.length === 0) {
+        toast.error('Es gibt keine Teams')
+        return
+      }
+      if (!this.orgName || this.orgName === '' || this.orgName.trim() === '') {
+        toast.error('Keine Organisation angegeben')
+        return
+      }
+      console.log('---Creating teams...---')
+      this.teams.forEach(async (team) => {
+        let fullTeamName = this.teamNamePrefix + team.name
+        const teamCreateResponse = await API_Service.createTeam(fullTeamName, this.orgName, this.parentTeam?.id)
+        const createdTeam = teamCreateResponse.data
+        // this.createdTeams.push(createdTeam)
+        team.id = createdTeam.id
+        toast.apiSuccess(teamCreateResponse, 'Team: ' + teamCreateResponse.data.name + ' angelegt!')
+
+        team.members.forEach(async (member) => {
+          const updateMembershipResponse = await API_Service.updateTeamMembership(this.orgName, createdTeam.slug, member, 'member')
+          console.log("updateMembershipResponse: ",updateMembershipResponse)
+          toast.apiSuccess(updateMembershipResponse, 'Nutzer: ' + member + ' wurde in das Team: ' + teamCreateResponse.data.name + ' eingeladen!')
+        })
+
+        team.repos.forEach(async (repo) => {
+          const fullRepoName = this.teamNamePrefix + repo.name
+          const repoCreateResponse = await API_Service.createRepo(this.orgName, fullRepoName, team.id)
+          toast.apiSuccess(repoCreateResponse, 'Repository: ' + repoCreateResponse.data.name + ' wurde angelegt!')
+          console.log('Created repo: ', repoCreateResponse.data)
+        })
+      })
+    }
   }
 }
 </script>
