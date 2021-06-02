@@ -27,13 +27,13 @@ class API_Service {
             })
     }
 
-    async inviteUser(orgName, userId,_team_ids) {
+    async inviteUser(orgName, userId, _team_ids) {
         let response = await axios({
             method: 'post',
             url: API_URL + '/orgs/' + orgName + '/invitations',
             data: {
                 invitee_id: userId,
-                team_ids:_team_ids,
+                team_ids: _team_ids,
             },
             handleError: false
         })
@@ -48,10 +48,10 @@ class API_Service {
             })
     }
 
-    async createTeam(_name, org, _parent_team_id){
-        console.log("Trying to create team: " + _name +" in org: " + org  + " under Team: " + _parent_team_id)
+    async createTeam(_name, org, _parent_team_id) {
+        console.log("Trying to create team: " + _name + " in org: " + org + " under Team: " + _parent_team_id)
         const response = await axios({
-            method : 'post',
+            method: 'post',
             url: API_URL + '/orgs/' + org + '/teams',
             data: {
                 name: _name,
@@ -59,11 +59,11 @@ class API_Service {
                 privacy: 'closed'
             },
         })
-        console.log("Created a team: ",response)
+        console.log("Created a team: ", response)
         return response
     }
 
-    async listTeams (org){
+    async listTeams(org) {
         const response = await axios({
             method: 'get',
             url: API_URL + '/orgs/' + org + '/teams',
@@ -74,23 +74,23 @@ class API_Service {
         return response
     }
 
-    async updateTeamMembership(org, team_slug, username, _role){
+    async updateTeamMembership(org, team_slug, username, _role) {
         console.log("Trying to update team membership for: " + username + " to: " + _role)
         const response = await axios({
             method: 'put',
-            url: API_URL + '/orgs/'+ org + '/teams/' + team_slug + '/memberships/' + username,
+            url: API_URL + '/orgs/' + org + '/teams/' + team_slug + '/memberships/' + username,
             data: {
-                role:_role
+                role: _role
             }
         })
         return response
     }
 
-    async createRepo(org,_name, _team_id){
-        
+    async createRepo(org, _name, _team_id) {
+
         console.log("Trying to create a repo: " + _name + ' in org: ' + org + ' for team: ' + _team_id)
         const response = await axios({
-            method:'post',
+            method: 'post',
             url: API_URL + '/orgs/' + org + '/repos',
             data: {
                 name: _name,
@@ -100,6 +100,22 @@ class API_Service {
         })
         return response
 
+    }
+
+    async replaceAllRepositoryTopics(owner, repo, _names) {
+        console.log("Trying to replace all Repo Topics for: " + owner + "/" + repo + " with the topics: ", _names)
+        const response = await axios({
+            method: 'put',
+            url: API_URL + '/repos/' + owner + '/' + repo + '/topics',
+            data: {
+                names: _names
+            },
+            headers: {
+                Accept: 'application/vnd.github.mercy-preview+json' //<-- Topics are still in Preview for Developers
+            }
+
+        })
+        return response
     }
 }
 export default new API_Service;

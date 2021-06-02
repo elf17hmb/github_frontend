@@ -32,10 +32,16 @@
       </div>
       <div class="col-12">
         <ul id="teamsList" class="list-group">
-          <li class="list-group-item text-start border-2" :class="{'status-success' : team.isNameAvailable, 'status-warning' : !team.isNameAvailable}" v-for="(team, teamIndex) in teams" :key="teamIndex" :value="teamIndex">
+          <li
+            class="list-group-item text-start border-2"
+            :class="{ 'status-success': team.isNameAvailable, 'status-warning': !team.isNameAvailable }"
+            v-for="(team, teamIndex) in teams"
+            :key="teamIndex"
+            :value="teamIndex"
+          >
             <div class="row">
               <div class="col-12 d-flex w-100 justify-content-between">
-                <h5>{{ teamNamePrefix + team.name }}</h5> 
+                <h5>{{ teamNamePrefix + team.name }}</h5>
                 <span v-if="!team.isNameAvailable" class="text-danger">schon vorhanden</span>
                 <button class="btn-close small" @click="deleteTeam(teamIndex)" aria-label="remove this team"></button>
               </div>
@@ -67,6 +73,9 @@
                       </div>
                       <div class="col text-end">
                         <button class="btn-close small" @click="deleteRepoInTeam(repoIndex, teamIndex)" aria-label="remove this repo"></button>
+                      </div>
+                      <div class="col-12 d-flex flex-wrap">
+                        <div v-for="(topic, topicIndex) in teams[teamIndex].topics" :key="topicIndex" class="badge rounded-pill bg-light text-dark">{{ topic }}</div>
                       </div>
                     </div>
                   </li>
@@ -275,6 +284,10 @@ export default {
           const repoCreateResponse = await API_Service.createRepo(this.orgName, fullRepoName, team.id)
           toast.apiSuccess(repoCreateResponse, 'Repository: ' + repoCreateResponse.data.name + ' wurde angelegt!')
           console.log('Created repo: ', repoCreateResponse.data)
+          if (team.topics && team.topics.length > 0) {
+            const topicAddResponse = await API_Service.replaceAllRepositoryTopics(this.orgName, fullRepoName, team.topics)
+            console.log("Topics hinzugefügt: " , topicAddResponse)
+          }
         })
       })
     },
@@ -293,6 +306,18 @@ export default {
             team.isNameAvailable = true
             // return true
           })
+      })
+      this.updateRepoTopics()
+    },
+
+    updateRepoTopics() {
+      this.teams.forEach((team) => {
+        const fullTeamName = this.teamNamePrefix
+        const topics = fullTeamName.split('-').filter((string) => {
+          return string.trim() != ''
+        })
+        team.topics = topics
+        console.log('Team: ' + team.name + " it's topics: ", team.topics)
       })
     }
   }
