@@ -32,10 +32,11 @@
       </div>
       <div class="col-12">
         <ul id="teamsList" class="list-group">
-          <li class="list-group-item text-start border-2" v-for="(team, teamIndex) in teams" :key="teamIndex" :value="teamIndex">
+          <li class="list-group-item text-start border-2" :class="{'status-success' : team.isNameAvailable, 'status-warning' : !team.isNameAvailable}" v-for="(team, teamIndex) in teams" :key="teamIndex" :value="teamIndex">
             <div class="row">
               <div class="col-12 d-flex w-100 justify-content-between">
-                <h5>{{ teamNamePrefix + team.name }}</h5>
+                <h5>{{ teamNamePrefix + team.name }}</h5> 
+                <span v-if="!team.isNameAvailable" class="text-danger">schon vorhanden</span>
                 <button class="btn-close small" @click="deleteTeam(teamIndex)" aria-label="remove this team"></button>
               </div>
               <div class="col-12 col-md-6">
@@ -84,7 +85,7 @@
           </li>
         </ul>
       </div>
-      <div><button class="btn btn-primary" @click="createTeams">Teams erstellen</button></div>
+      <div class="mt-2"><button class="btn btn-primary" @click="createTeams">Teams erstellen</button></div>
     </div>
   </div>
   <InputModal @submitNames="createTeamPreviews" :modalId="teamInputModalId" :heading="'Teams eingeben'" />
@@ -94,7 +95,7 @@
 import API_Service from '../services/API'
 import InputModal from '../components/Input_Modal'
 import toast from '../services/toast'
-// import API from '../services/API'
+
 export default {
   data() {
     return {
@@ -145,7 +146,8 @@ export default {
         .map((team) => {
           let teamObj = {}
           let trimmedTeam = team.trim()
-          teamObj.name = trimmedTeam.substr(0, trimmedTeam.indexOf(':'))
+          const trimmedTeamName = trimmedTeam.substr(0, trimmedTeam.indexOf(':')).trim()
+          teamObj.name = trimmedTeamName.replace(' ', '-')
           let members = trimmedTeam.substr(trimmedTeam.indexOf(':') + 1, trimmedTeam.length)
           teamObj.members = members
             .split(',')
@@ -199,6 +201,7 @@ export default {
           repos: this.generateRepos ? [{ name: teamName + '-repo-' + 0 }] : []
         })
       })
+      this.checkTeamNames()
     },
 
     createMemberPreviews(teamIndex, membersString) {
@@ -213,12 +216,15 @@ export default {
         console.log('Got parent team: ', response)
         this.parentTeam = response.data
         this.teamNamePrefix = this.parentTeam.slug + '-'
+
+        this.checkTeamNames()
       })
     },
 
     removeParentTeam() {
       this.parentTeam = null
       this.teamNamePrefix = ''
+      this.checkTeamNames()
     },
 
     deleteTeam(index) {
@@ -260,7 +266,7 @@ export default {
 
         team.members.forEach(async (member) => {
           const updateMembershipResponse = await API_Service.updateTeamMembership(this.orgName, createdTeam.slug, member, 'member')
-          console.log("updateMembershipResponse: ",updateMembershipResponse)
+          console.log('updateMembershipResponse: ', updateMembershipResponse)
           toast.apiSuccess(updateMembershipResponse, 'Nutzer: ' + member + ' wurde in das Team: ' + teamCreateResponse.data.name + ' eingeladen!')
         })
 
@@ -271,10 +277,36 @@ export default {
           console.log('Created repo: ', repoCreateResponse.data)
         })
       })
+    },
+
+    checkTeamNames() {
+      this.teams.forEach((team) => {
+        const fullTeamName = this.teamNamePrefix + team.name
+        API_Service.getTeam(this.orgName, fullTeamName, false)
+          .then((response) => {
+            console.log('Team with the name:' + fullTeamName + ' was found! Response: ', response)
+            team.isNameAvailable = false
+            // return false
+          })
+          .catch((error) => {
+            console.log('The name: ' + fullTeamName + ' for a team is available! The (expected) Error:', error)
+            team.isNameAvailable = true
+            // return true
+          })
+      })
     }
   }
 }
 </script>
 
-<style>
+<style scoped>
+.status-success {
+  background: rgba(164, 212, 108, 0.5);
+  border-color: green;
+}
+
+.status-warning {
+  background: rgba(250, 131, 33, 0.5);
+  border-color: rgb(128, 62, 0);
+}
 </style>
