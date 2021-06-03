@@ -76,9 +76,10 @@
                       </div>
                       <div class="col-12 d-flex flex-wrap">
                         <div v-for="(topic, topicIndex) in teams[teamIndex].topics" :key="topicIndex" class="badge rounded-pill bg-light text-dark">
-                          <span>{{topic}}</span>
-                          <button class="btn-close small" @click="deleteTopicInTeam(topicIndex,teamIndex)" aria-label="remove this topic"></button>
+                          <span>{{ topic }}</span>
+                          <button class="btn-close small" @click="deleteTopicInTeam(topicIndex, teamIndex)" aria-label="remove this topic"></button>
                         </div>
+                        <button data-bs-toggle="collapse" :data-bs-target="'#collapse-' + teamIndex" class="badge btn btn-light rounded-pill text-dark">+</button>
                       </div>
                     </div>
                   </li>
@@ -89,6 +90,10 @@
               </div>
               <div class="text-center">
                 <InputModal @submitNames="createMemberPreviews(teamIndex, $event)" :modalId="memberInputModalId + teamIndex" :heading="'GH-Namen eingeben'" />
+              </div>
+              <div :id="'collapse-' + teamIndex" class="col collapse mt-1">
+                <label for="topic_input">Topics hinzufügen:</label>
+                <input :id="'topic_input_' + teamIndex" type="text" v-model="team.topicInput" class="form-control" @input="addTopicsToTeam(teamIndex)" />
               </div>
             </div>
           </li>
@@ -118,7 +123,7 @@ export default {
       parentTeam: null,
       generateRepos: true,
       teamNamePrefix: '',
-      createdTeams: []
+      createdTeams: [],
     }
   },
   props: {
@@ -289,7 +294,7 @@ export default {
           console.log('Created repo: ', repoCreateResponse.data)
           if (team.topics && team.topics.length > 0) {
             const topicAddResponse = await API_Service.replaceAllRepositoryTopics(this.orgName, fullRepoName, team.topics)
-            console.log("Topics hinzugefügt: " , topicAddResponse)
+            console.log('Topics hinzugefügt: ', topicAddResponse)
           }
         })
       })
@@ -325,7 +330,27 @@ export default {
     },
 
     deleteTopicInTeam(topicIndex, teamIndex) {
-      this.teams[teamIndex].topics.splice(topicIndex,1)
+      this.teams[teamIndex].topics.splice(topicIndex, 1)
+    },
+
+    addTopicsToTeam(teamIndex) {
+      console.log('add topics to team: ' + teamIndex + ' string: ' + this.teams[teamIndex].topicInput)
+      let topicsString = this.teams[teamIndex].topicInput
+      if(topicsString.includes(',')){
+        let topicsArray = topicsString.split(',')
+                                      .filter(topic=>{
+                                        return topic.trim() != ''
+                                      })
+                                      .map(topic => {
+                                        return topic.trim()
+                                      })
+        let topicsOfCurrentTeam = this.teams[teamIndex].topics
+        topicsArray = topicsArray.filter(topic => {
+          return topicsOfCurrentTeam.indexOf(topic) < 0
+        })
+        this.teams[teamIndex].topics = topicsOfCurrentTeam.concat(topicsArray)
+        this.teams[teamIndex].topicInput = ''
+      }
     }
   }
 }
