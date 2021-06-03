@@ -76,7 +76,6 @@ export default {
   props:{
     selectOrgName:{
       type:String,
-      default: 'LOL'
     },
   },
 

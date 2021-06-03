@@ -1,6 +1,11 @@
 <template>
   <div class="container h-100">
-    <h3 class="text-start">Org: {{ orgName }}</h3>
+    <select name="" id="" class="form-select" v-model="selectedOrg"  aria-label="organizations">
+          <option disabled selected value="">Organisation auswählen</option>
+          <option v-for="org in orgs" v-bind:key="org.id" v-bind:value="org.login">
+            {{ org.login }}
+          </option>
+        </select>
     <div class="text-start">
       <label for="vorschau">Vorschau Teams:</label>
     </div>
@@ -124,6 +129,8 @@ export default {
       generateRepos: true,
       teamNamePrefix: '',
       createdTeams: [],
+      orgs:[],
+      selectedOrg:'',
     }
   },
   props: {
@@ -131,6 +138,14 @@ export default {
   },
   components: {
     InputModal
+  },
+  mounted() {
+    API_Service.getUserOrgs().then((response) => {
+      this.orgs = response.data
+    })
+    if(this.orgName && this.orgName != ''){
+      this.selectedOrg = this.orgName
+    }
   },
   methods: {
     // async createTestTeams() {
@@ -229,7 +244,7 @@ export default {
     },
 
     lookUpParentTeam(team_slug) {
-      API_Service.getTeam(this.orgName, team_slug).then((response) => {
+      API_Service.getTeam(this.selectedOrg, team_slug).then((response) => {
         console.log('Got parent team: ', response)
         this.parentTeam = response.data
         this.teamNamePrefix = this.parentTeam.slug + '-'
@@ -268,32 +283,32 @@ export default {
         toast.error('Es gibt keine Teams')
         return
       }
-      if (!this.orgName || this.orgName === '' || this.orgName.trim() === '') {
+      if (!this.selectedOrg || this.selectedOrg === '' || this.selectedOrg.trim() === '') {
         toast.error('Keine Organisation angegeben')
         return
       }
       console.log('---Creating teams...---')
       this.teams.forEach(async (team) => {
         let fullTeamName = this.teamNamePrefix + team.name
-        const teamCreateResponse = await API_Service.createTeam(fullTeamName, this.orgName, this.parentTeam?.id)
+        const teamCreateResponse = await API_Service.createTeam(fullTeamName, this.selectedOrg, this.parentTeam?.id)
         const createdTeam = teamCreateResponse.data
         // this.createdTeams.push(createdTeam)
         team.id = createdTeam.id
         toast.apiSuccess(teamCreateResponse, 'Team: ' + teamCreateResponse.data.name + ' angelegt!')
 
         team.members.forEach(async (member) => {
-          const updateMembershipResponse = await API_Service.updateTeamMembership(this.orgName, createdTeam.slug, member, 'member')
+          const updateMembershipResponse = await API_Service.updateTeamMembership(this.selectedOrg, createdTeam.slug, member, 'member')
           console.log('updateMembershipResponse: ', updateMembershipResponse)
           toast.apiSuccess(updateMembershipResponse, 'Nutzer: ' + member + ' wurde in das Team: ' + teamCreateResponse.data.name + ' eingeladen!')
         })
 
         team.repos.forEach(async (repo) => {
           const fullRepoName = this.teamNamePrefix + repo.name
-          const repoCreateResponse = await API_Service.createRepo(this.orgName, fullRepoName, team.id)
+          const repoCreateResponse = await API_Service.createRepo(this.selectedOrg, fullRepoName, team.id)
           toast.apiSuccess(repoCreateResponse, 'Repository: ' + repoCreateResponse.data.name + ' wurde angelegt!')
           console.log('Created repo: ', repoCreateResponse.data)
           if (team.topics && team.topics.length > 0) {
-            const topicAddResponse = await API_Service.replaceAllRepositoryTopics(this.orgName, fullRepoName, team.topics)
+            const topicAddResponse = await API_Service.replaceAllRepositoryTopics(this.selectedOrg, fullRepoName, team.topics)
             console.log('Topics hinzugefügt: ', topicAddResponse)
           }
         })
@@ -303,7 +318,7 @@ export default {
     checkTeamNames() {
       this.teams.forEach((team) => {
         const fullTeamName = this.teamNamePrefix + team.name
-        API_Service.getTeam(this.orgName, fullTeamName, false)
+        API_Service.getTeam(this.selectedOrg, fullTeamName, false)
           .then((response) => {
             console.log('Team with the name:' + fullTeamName + ' was found! Response: ', response)
             team.isNameAvailable = false
@@ -336,16 +351,17 @@ export default {
     addTopicsToTeam(teamIndex) {
       console.log('add topics to team: ' + teamIndex + ' string: ' + this.teams[teamIndex].topicInput)
       let topicsString = this.teams[teamIndex].topicInput
-      if(topicsString.includes(',')){
-        let topicsArray = topicsString.split(',')
-                                      .filter(topic=>{
-                                        return topic.trim() != ''
-                                      })
-                                      .map(topic => {
-                                        return topic.trim()
-                                      })
+      if (topicsString.includes(',')) {
+        let topicsArray = topicsString
+          .split(',')
+          .filter((topic) => {
+            return topic.trim() != ''
+          })
+          .map((topic) => {
+            return topic.trim()
+          })
         let topicsOfCurrentTeam = this.teams[teamIndex].topics
-        topicsArray = topicsArray.filter(topic => {
+        topicsArray = topicsArray.filter((topic) => {
           return topicsOfCurrentTeam.indexOf(topic) < 0
         })
         this.teams[teamIndex].topics = topicsOfCurrentTeam.concat(topicsArray)
