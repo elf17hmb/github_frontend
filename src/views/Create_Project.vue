@@ -75,7 +75,10 @@
                         <button class="btn-close small" @click="deleteRepoInTeam(repoIndex, teamIndex)" aria-label="remove this repo"></button>
                       </div>
                       <div class="col-12 d-flex flex-wrap">
-                        <div v-for="(topic, topicIndex) in teams[teamIndex].topics" :key="topicIndex" class="badge rounded-pill bg-light text-dark">{{ topic }}</div>
+                        <div v-for="(topic, topicIndex) in teams[teamIndex].topics" :key="topicIndex" class="badge rounded-pill bg-light text-dark">
+                          <span>{{topic}}</span>
+                          <button class="btn-close small" @click="deleteTopicInTeam(topicIndex,teamIndex)" aria-label="remove this topic"></button>
+                        </div>
                       </div>
                     </div>
                   </li>
@@ -319,6 +322,10 @@ export default {
         team.topics = topics
         console.log('Team: ' + team.name + " it's topics: ", team.topics)
       })
+    },
+
+    deleteTopicInTeam(topicIndex, teamIndex) {
+      this.teams[teamIndex].topics.splice(topicIndex,1)
     }
   }
 }
