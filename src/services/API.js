@@ -10,11 +10,11 @@ class API_Service {
         return axios
             .get(API_URL + '/user/orgs')
             .then(response => {
-                console.log('Got the orgs for the authenticated user: ', response)
+                console.log('Erfolg! ', response)
                 return response;
             })
             .catch(error => {
-                console.log(error)
+                console.warn('Fehler! ', error)
             })
     }
 

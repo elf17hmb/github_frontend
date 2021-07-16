@@ -11,7 +11,7 @@
         <p class="mt-5">
           <input type="text" class="rounded-pill" v-model="patoken" />
         </p>
-        <button @click="persist" class="btn btn-primary rounded-pill">Sign in via GitHub</button>
+        <button @click="persist" class="btn btn-primary rounded-pill">PA-Token eingeben</button>
         <p><a href="https://github.com/settings/tokens" target="_blank" class="small">https://github.com/settings/tokens</a></p>
       </div>
     </div>
@@ -36,10 +36,11 @@ export default {
         if(response.status == 200){
           sessionStorage.avatar_url = response.data.avatar_url
           sessionStorage.login = response.data.login
-          toast.apiSuccess(response, 'valid Personal Access Token')
+          toast.apiSuccess(response, 'Personal-Access-Token validiert')
         }
         this.$router.push({ name: 'Home' })
       } catch (err) {
+        sessionStorage.removeItem('patoken')
         console.log(err)
       }
     }

@@ -54,7 +54,6 @@ router.beforeEach(async (to, from, next) => {
   if (to.path == '/login') {
     sessionStorage.removeItem('patoken')
   }
-  // const isTokenValid = await API_Service.checkTokenStatus();
   if (isPrivatePage && !sessionStorage.getItem('patoken')) {
     return next({ name: 'Login' })
   } else {

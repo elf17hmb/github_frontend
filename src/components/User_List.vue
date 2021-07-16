@@ -1,5 +1,5 @@
 <template>
-  <div class="border mt-5">
+  <div class="border">
     <div class="row m-2 g-3">
       <div v-if="loading">
         <span class="spinner-border spinner-border-sm"></span>

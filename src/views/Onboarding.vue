@@ -2,13 +2,14 @@
   <div class="container">
     <div class="row g-3">
       <div class="col">
+        <h3>Nutzer eingeben:</h3>
         <UserList @submitNames="lookUpUsers" @deleteUser="deleteUser" :users="users" />
       </div>
       <div class="col-12 mt-3">
-        <h3>Invite found Users to an organization:</h3>
+        <h3>Nutzer in eine Organisation einladen:</h3>
       </div>
       <div class="col-6 text-start">
-        <label for="organizations" class="small">Organizations:</label>
+        <label for="organizations" class="small">Organisationen:</label>
         <select name="" id="" class="form-select" v-model="selected" @change="emptyTeams" aria-label="organizations">
           <option disabled selected value="">Organisation auswählen</option>
           <option v-for="org in orgs" v-bind:key="org.id" v-bind:value="org.login">
@@ -17,13 +18,13 @@
         </select>
       </div>
       <div class="col-6 d-flex justify-content-center align-items-center">
-        <div class="form-check form-switch ">
-          <input class="form-check-input" type="checkbox" id="inviteToTeamSwitch" v-model="isTeamInviteActive" @change="emptyTeams"/>
-          <label for="inviteToTeamSwitch" class="form-check-label"> Invite into teams</label>
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" id="inviteToTeamSwitch" v-model="isTeamInviteActive" @change="emptyTeams" />
+          <label for="inviteToTeamSwitch" class="form-check-label"> In Teams einladen</label>
         </div>
       </div>
-
       <div class="col-12" v-if="isTeamInviteActive && selected">
+        <h3>Teams eingeben:</h3>
         <div class="rounded border">
           <ul class="list-group">
             <li class="list-group-item" v-for="(team, index) in teams" :key="team.id" :value="index">
@@ -43,7 +44,7 @@
       </div>
 
       <div class="col">
-        <button @click="inviteUsers" class="btn btn-primary">Invite</button>
+        <button @click="inviteUsers" class="btn btn-primary">Einladen</button>
       </div>
 
       <!-- For testing purposes: -->
@@ -73,10 +74,10 @@ export default {
     }
   },
 
-  props:{
-    selectOrgName:{
-      type:String,
-    },
+  props: {
+    selectOrgName: {
+      type: String
+    }
   },
 
   components: {
@@ -88,7 +89,7 @@ export default {
     API_Service.getUserOrgs().then((response) => {
       this.orgs = response.data
     })
-    if(this.selectOrgName && this.selectOrgName != ''){
+    if (this.selectOrgName && this.selectOrgName != '') {
       this.selected = this.selectOrgName
     }
   },
@@ -182,9 +183,9 @@ export default {
     deleteUser(index) {
       this.users.splice(index, 1)
     },
-    emptyTeams(){
+    emptyTeams() {
       this.teams.length = 0
-    },
+    }
     // async getAllTeams(){
     //   const lastPagePrefix = '&page='
     //   const lastPageStringPartTwo = '>; rel="last"'

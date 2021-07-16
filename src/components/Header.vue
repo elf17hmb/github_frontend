@@ -4,7 +4,7 @@
       <div class="container-fluid">
         <router-link :to="{ name: 'Home' }" class="navbar-brand">GitHub-Tool</router-link>
         <div class="navbar-text">
-          <span >Signed in as:</span>
+          <span >Eingeloggt als:</span>
           <img :src="avatar_url" width="40" height="40" class="ms-2 me-2" />
           <span>{{ login }}</span>
         </div>

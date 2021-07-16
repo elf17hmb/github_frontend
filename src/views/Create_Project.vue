@@ -214,11 +214,6 @@ export default {
 
     createTeamPreviews(teamString) {
       const teamsArray = this.parseTeamInput(teamString)
-      // let teamNamePrefix = ''
-      // if(this.parentTeam){
-      //   teamNamePrefix = this.parentTeam.slug + '-'
-      // }
-      // if (this.generateRepos) {
       teamsArray.forEach((team) => {
         let teamName = ''
         if (team.name) {
