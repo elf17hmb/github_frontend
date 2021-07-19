@@ -2,7 +2,7 @@
 
 Dieses Repository ist öffentlich zugänglich und besitzt neben dem ``master``-Branch einen zusätzlichen ``gh-pages``-Branch. 
 
-Dieser Branch enthält nur die durch den Build-Prozess kompilierte statische Webseite aus dem “dist”-Verzeichnis. Sie steht mithilfe von GitHub-Pages unter der folgenden URL-Adresse zur Verfügung:
+Dieser Branch enthält nur die durch den Build-Prozess kompilierte statische Webseite aus dem ``dist``-Verzeichnis. Sie steht mithilfe von GitHub-Pages unter der folgenden URL-Adresse zur Verfügung:
 https://elf17hmb.github.io/github_frontend/ (Stand: 19.07.2021).
 
 
